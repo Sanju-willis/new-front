@@ -1,3 +1,4 @@
+// src\app\dashboard\page.tsx
 'use client';
 
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -17,20 +18,26 @@ export default function DashboardHome() {
 
 
 
- useEffect(() => {
+useEffect(() => {
   if (!user || progress === undefined || hasTriggeredRef.current) return;
 
-  hasTriggeredRef.current = true; // prevent repeat
+  hasTriggeredRef.current = true;
 
   if (!progress) {
     setShowCompanyForm(true);
-  }
 
-  sendMessage({
-    stage: progress?.stage ?? null,
-    step: 'resume',
-  });
+    sendMessage({
+      stage: 'create_company',
+      step: 'form_opened',
+    });
+  } else {
+    sendMessage({
+      stage: progress.stage,
+      step: 'resume',
+    });
+  }
 }, [user, progress]);
+
 
   return (
     <div className="p-4">
