@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useAssistantStore } from '@/stores/useAssistantStore';
 
-const steps = ['company_name', 'industry', 'role'] as const;
+const steps = ['company_name', 'industry', 'target_market','description', 'role'] as const;
 type Step = typeof steps[number];
 
 export default function CompanyForm({ onClose }: { onClose: () => void }) {
@@ -15,6 +15,8 @@ export default function CompanyForm({ onClose }: { onClose: () => void }) {
   const [formData, setFormData] = useState({
     companyName: '',
     industry: '',
+    targetMarket: '',
+  description: '',
     role: '',
   });
 
@@ -95,6 +97,24 @@ export default function CompanyForm({ onClose }: { onClose: () => void }) {
           onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
         />
       )}
+      {currentStep === 'target_market' && (
+  <input
+    className="w-full border mb-2 p-2"
+    placeholder="Target Market"
+    value={formData.targetMarket}
+    onChange={(e) => setFormData({ ...formData, targetMarket: e.target.value })}
+  />
+)}
+
+{currentStep === 'description' && (
+  <textarea
+    className="w-full border mb-2 p-2"
+    placeholder="Brief Company Description"
+    value={formData.description}
+    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+  />
+)}
+
 
       {currentStep === 'role' && (
         <input
