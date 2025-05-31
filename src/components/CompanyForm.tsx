@@ -53,6 +53,11 @@ export default function CompanyForm({ onClose }: { onClose: () => void }) {
         ? formData.companyName
         : currentStep === 'industry'
         ? formData.industry
+                : currentStep === 'target_market'
+        ? formData.targetMarket
+                : currentStep === 'description'
+        ? formData.description
+
         : formData.role;
 
     if (!value.trim()) {
