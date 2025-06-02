@@ -5,7 +5,10 @@ import { useState } from 'react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useAssistantStore } from '@/stores/useAssistantStore';
 
-const steps = ['company_name', 'industry', 'target_market', 'description', 'role'] as const;
+const steps = [ 'company_name', 'industry', 'size', 'type', 'target_market', 'address', 'website', 'description', 'target_audience',
+  'role',
+] as const;
+
 type Step = typeof steps[number];
 
 const INDUSTRY_OPTIONS = [
