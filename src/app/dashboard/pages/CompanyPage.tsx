@@ -1,16 +1,21 @@
-// src\app\dashboard\pages\CompanyPage.tsx
 'use client';
+
 import { useState, useEffect } from 'react';
 import { useCompanyData } from '@/hooks/useCompanyData';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 
 export default function CompanyPage() {
-const { data, isLoading, error, refetch, isFetching } = useCompanyData();
+  const { data, isLoading, error, refetch, isFetching } = useCompanyData();
 
   const [name, setName] = useState('');
   const [industry, setIndustry] = useState('');
   const [description, setDescription] = useState('');
+  const [status, setStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
-  // ✅ Safe state sync once data is fetched
   useEffect(() => {
     if (data) {
       setName(data.name || '');
@@ -20,6 +25,7 @@ const { data, isLoading, error, refetch, isFetching } = useCompanyData();
   }, [data]);
 
   const handleUpdate = async () => {
+    setStatus('saving');
     const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/patch/company`, {
       method: 'PATCH',
       credentials: 'include',
@@ -27,33 +33,53 @@ const { data, isLoading, error, refetch, isFetching } = useCompanyData();
       body: JSON.stringify({ name, industry, description }),
     });
 
-    if (res.ok) {
-      alert('✅ Company updated!');
-      location.reload();
-    } else {
-      alert('❌ Failed to update company');
-    }
+    setStatus(res.ok ? 'success' : 'error');
+    if (res.ok) await refetch();
   };
 
-  if (isLoading) return <div>Loading company info...</div>;
-  if (error || !data) return <div>Error loading company data</div>;
+  if (isLoading) return <div className="p-4">Loading company info...</div>;
+  if (error || !data) return <div className="p-4 text-red-500">Error loading company data</div>;
 
   return (
-    <div>
-      <h1 className="text-xl font-semibold mb-4">Edit Company Info</h1>
-      <div className="space-y-3">
-        <input value={name} onChange={e => setName(e.target.value)} placeholder="Name" className="border p-2 w-full" />
-        <input value={industry} onChange={e => setIndustry(e.target.value)} placeholder="Industry" className="border p-2 w-full" />
-        <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Description" className="border p-2 w-full" />
-        <button onClick={handleUpdate} className="bg-black text-white px-4 py-2 rounded">Update</button>
-      </div>
-      <button
-  onClick={() => refetch()}
-  className="bg-blue-500 text-white px-3 py-1 rounded"
->
-  🔄 Refresh Company Data {isFetching && '...'}
-</button>
+    <Card className="max-w-xl mx-auto mt-10">
+      <CardContent className="space-y-4 p-6">
+        <h1 className="text-2xl font-bold">Company Profile</h1>
 
-    </div>
+        <Input
+          value={name}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+          placeholder="Company Name"
+        />
+        <Input
+          value={industry}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIndustry(e.target.value)}
+          placeholder="Industry"
+        />
+        <Textarea
+          value={description}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
+          placeholder="Company Description"
+        />
+
+        <div className="flex items-center gap-2">
+          <Button onClick={handleUpdate} disabled={status === 'saving'}>
+            {status === 'saving' ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="animate-spin h-4 w-4" /> Saving...
+              </span>
+            ) : (
+              'Update'
+            )}
+          </Button>
+
+          <Button variant="secondary" onClick={() => refetch()} disabled={isFetching}>
+            🔄 Refresh {isFetching && <Loader2 className="animate-spin h-4 w-4 ml-1" />}
+          </Button>
+
+          {status === 'success' && <span className="text-green-600">Saved!</span>}
+          {status === 'error' && <span className="text-red-500">Failed to save</span>}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

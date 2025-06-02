@@ -1,4 +1,4 @@
-// src/components/layouts/DashLayout.tsx
+// src\components\layouts\DashLayout.tsx
 'use client';
 import { ReactNode } from 'react';
 import Sidebar from './Sidebar';

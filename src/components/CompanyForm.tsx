@@ -1,14 +1,10 @@
-// src\components\CompanyForm.tsx
 'use client';
 
 import { useState } from 'react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useAssistantStore } from '@/stores/useAssistantStore';
 
-const steps = [ 'company_name', 'industry', 'size', 'type', 'target_market', 'address', 'website', 'description', 'target_audience',
-  'role',
-] as const;
-
+const steps = ['company_name', 'industry', 'target_market', 'description', 'role', 'items'] as const;
 type Step = typeof steps[number];
 
 const INDUSTRY_OPTIONS = [
@@ -33,6 +29,7 @@ export default function CompanyForm({ onClose }: { onClose: () => void }) {
     targetMarket: '',
     description: '',
     role: '',
+    items: [] as { name: string; type: 'product' | 'service' }[],
   });
 
   const [currentStep, setCurrentStep] = useState<Step>('company_name');
@@ -63,16 +60,20 @@ export default function CompanyForm({ onClose }: { onClose: () => void }) {
   };
 
   const handleNext = async () => {
-    const value =
-      currentStep === 'company_name'
-        ? formData.companyName
-        : currentStep === 'industry'
-        ? formData.industry
-        : currentStep === 'target_market'
-        ? formData.targetMarket
-        : currentStep === 'description'
-        ? formData.description
-        : formData.role;
+    let value = '';
+
+    if (currentStep === 'company_name') value = formData.companyName;
+    else if (currentStep === 'industry') value = formData.industry;
+    else if (currentStep === 'target_market') value = formData.targetMarket;
+    else if (currentStep === 'description') value = formData.description;
+    else if (currentStep === 'role') value = formData.role;
+    else if (currentStep === 'items') {
+      if (formData.items.length === 0 || formData.items.some(item => !item.name.trim())) {
+        setError('Please add at least one valid item.');
+        return;
+      }
+      value = JSON.stringify(formData.items);
+    }
 
     if (!value.trim()) {
       setError('This field is required.');
@@ -164,7 +165,49 @@ export default function CompanyForm({ onClose }: { onClose: () => void }) {
         </select>
       )}
 
-      {error && <p className="text-red-500">{error}</p>}
+      {currentStep === 'items' && (
+        <div>
+          {formData.items.map((item, idx) => (
+            <div key={idx} className="flex gap-2 mb-2">
+              <input
+                className="border p-2 flex-1"
+                placeholder="Item Name"
+                value={item.name}
+                onChange={(e) => {
+                  const updated = [...formData.items];
+                  updated[idx].name = e.target.value;
+                  setFormData({ ...formData, items: updated });
+                }}
+              />
+              <select
+                className="border p-2"
+                value={item.type}
+                onChange={(e) => {
+                  const updated = [...formData.items];
+                  updated[idx].type = e.target.value as 'product' | 'service';
+                  setFormData({ ...formData, items: updated });
+                }}
+              >
+                <option value="product">Product</option>
+                <option value="service">Service</option>
+              </select>
+            </div>
+          ))}
+          <button
+            className="mt-2 text-blue-600 underline"
+            onClick={() =>
+              setFormData({
+                ...formData,
+                items: [...formData.items, { name: '', type: 'product' }],
+              })
+            }
+          >
+            + Add Item
+          </button>
+        </div>
+      )}
+
+      {error && <p className="text-red-500 mt-2">{error}</p>}
 
       <div className="flex justify-between mt-4">
         <button

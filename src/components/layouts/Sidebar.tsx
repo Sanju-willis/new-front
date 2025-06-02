@@ -2,15 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  Home,
-  Building2,
-  Boxes,
-  Layers3,
-  Settings,
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react';
+import { Home, Building2, Boxes, Layers3, Settings, ChevronLeft, ChevronRight,Target } from 'lucide-react';
 
 interface SidebarProps {
   currentPage: string;
@@ -21,7 +13,8 @@ const navItems = [
   { id: 'home', label: 'Home', icon: Home },
   { id: 'company', label: 'Company', icon: Building2 },
   { id: 'products', label: 'Products', icon: Boxes },
-  { id: 'services', label: 'Services', icon: Layers3 },
+    { id: 'campaigns', label: 'Campaigns', icon: Target }, // ← Add this
+
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
