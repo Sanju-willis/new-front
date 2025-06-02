@@ -1,9 +1,9 @@
-// src\app\dashboard\layout.tsx
 'use client';
 
 import { ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/useAuthStore';
+import QueryProvider from '@/providers/QueryProvider'; // 👈 Import your provider
 
 export default function Layout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -19,7 +19,11 @@ export default function Layout({ children }: { children: ReactNode }) {
     }
   }, [loading, user]);
 
-  if (loading) return null; // remove any UI gap/flash
+  if (loading) return null;
 
-  return <>{children}</>;
+  return (
+    <QueryProvider>
+      {children}
+    </QueryProvider>
+  );
 }

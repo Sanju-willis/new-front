@@ -39,10 +39,9 @@ export default function DashboardHome() {
   };
 
   return (
-    <DashboardLayout>
-      {renderPage()}
-      {showCompanyForm && <CompanyForm onClose={() => setShowCompanyForm(false)} />}
-      <SupportChatWidget />
-    </DashboardLayout>
-  );
-}
+  <DashboardLayout currentPage={currentPage} onChange={setCurrentPage}>
+    {renderPage()}
+    {showCompanyForm && <CompanyForm onClose={() => setShowCompanyForm(false)} />}
+    <SupportChatWidget />
+  </DashboardLayout>
+);}
