@@ -5,7 +5,7 @@ import { ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/useAuthStore';
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+export default function Layout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { user, loading, fetchUser } = useAuthStore();
 
@@ -19,12 +19,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     }
   }, [loading, user]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return null; // remove any UI gap/flash
 
-  return (
-    <div className="flex h-screen">
-      {/* Add sidebar/header later */}
-      <main className="flex-1 overflow-auto p-6 bg-gray-50">{children}</main>
-    </div>
-  );
+  return <>{children}</>;
 }

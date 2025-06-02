@@ -5,8 +5,20 @@ import { useState } from 'react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useAssistantStore } from '@/stores/useAssistantStore';
 
-const steps = ['company_name', 'industry', 'target_market','description', 'role'] as const;
+const steps = ['company_name', 'industry', 'target_market', 'description', 'role'] as const;
 type Step = typeof steps[number];
+
+const INDUSTRY_OPTIONS = [
+  'Healthtech', 'E-commerce', 'SaaS', 'EdTech', 'Fintech', 'Agency', 'AI & ML', 'Other'
+];
+
+const TARGET_MARKET_OPTIONS = [
+  'B2B', 'B2C', 'Enterprise', 'Small Business', 'Freelancers', 'Developers', 'Healthcare', 'Education'
+];
+
+const ROLE_OPTIONS = [
+  'Founder', 'CEO', 'CTO', 'CMO', 'Product Manager', 'Marketing Lead', 'Engineer', 'Consultant'
+];
 
 export default function CompanyForm({ onClose }: { onClose: () => void }) {
   const { fetchUser } = useAuthStore();
@@ -16,7 +28,7 @@ export default function CompanyForm({ onClose }: { onClose: () => void }) {
     companyName: '',
     industry: '',
     targetMarket: '',
-  description: '',
+    description: '',
     role: '',
   });
 
@@ -53,11 +65,10 @@ export default function CompanyForm({ onClose }: { onClose: () => void }) {
         ? formData.companyName
         : currentStep === 'industry'
         ? formData.industry
-                : currentStep === 'target_market'
+        : currentStep === 'target_market'
         ? formData.targetMarket
-                : currentStep === 'description'
+        : currentStep === 'description'
         ? formData.description
-
         : formData.role;
 
     if (!value.trim()) {
@@ -81,6 +92,14 @@ export default function CompanyForm({ onClose }: { onClose: () => void }) {
     }
   };
 
+  const handleBack = () => {
+    const currentIndex = steps.indexOf(currentStep);
+    if (currentIndex > 0) {
+      setCurrentStep(steps[currentIndex - 1]);
+      setError('');
+    }
+  };
+
   return (
     <div className="p-4 border rounded-md shadow-md max-w-md">
       <h2 className="text-xl font-semibold mb-4">Create Your Company</h2>
@@ -95,50 +114,72 @@ export default function CompanyForm({ onClose }: { onClose: () => void }) {
       )}
 
       {currentStep === 'industry' && (
-        <input
+        <select
           className="w-full border mb-2 p-2"
-          placeholder="Industry"
           value={formData.industry}
           onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+        >
+          <option value="">Select Industry</option>
+          {INDUSTRY_OPTIONS.map((opt) => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
+      )}
+
+      {currentStep === 'target_market' && (
+        <select
+          className="w-full border mb-2 p-2"
+          value={formData.targetMarket}
+          onChange={(e) => setFormData({ ...formData, targetMarket: e.target.value })}
+        >
+          <option value="">Select Target Market</option>
+          {TARGET_MARKET_OPTIONS.map((opt) => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
+      )}
+
+      {currentStep === 'description' && (
+        <textarea
+          className="w-full border mb-2 p-2"
+          placeholder="Brief Company Description"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         />
       )}
-      {currentStep === 'target_market' && (
-  <input
-    className="w-full border mb-2 p-2"
-    placeholder="Target Market"
-    value={formData.targetMarket}
-    onChange={(e) => setFormData({ ...formData, targetMarket: e.target.value })}
-  />
-)}
-
-{currentStep === 'description' && (
-  <textarea
-    className="w-full border mb-2 p-2"
-    placeholder="Brief Company Description"
-    value={formData.description}
-    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-  />
-)}
-
 
       {currentStep === 'role' && (
-        <input
+        <select
           className="w-full border mb-2 p-2"
-          placeholder="Your Role"
           value={formData.role}
           onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-        />
+        >
+          <option value="">Select Your Role</option>
+          {ROLE_OPTIONS.map((opt) => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
       )}
 
       {error && <p className="text-red-500">{error}</p>}
 
-      <button
-        className="bg-blue-500 text-white px-4 py-2 mt-2 rounded"
-        onClick={handleNext}
-        disabled={loading}
-      >
-        {loading ? 'Submitting...' : 'Next'}
-      </button>
+      <div className="flex justify-between mt-4">
+        <button
+          className="bg-gray-300 text-black px-4 py-2 rounded disabled:opacity-50"
+          onClick={handleBack}
+          disabled={steps.indexOf(currentStep) === 0 || loading}
+        >
+          Back
+        </button>
+
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+          onClick={handleNext}
+          disabled={loading}
+        >
+          {loading ? 'Submitting...' : 'Next'}
+        </button>
+      </div>
     </div>
   );
 }

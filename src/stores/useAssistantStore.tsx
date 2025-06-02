@@ -1,4 +1,4 @@
-// src/stores/useAssistantStore.ts
+// src\stores\useAssistantStore.tsx
 import { create } from 'zustand';
 
 interface AssistantMessagePayload {

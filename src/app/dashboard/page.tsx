@@ -1,51 +1,48 @@
 // src\app\dashboard\page.tsx
 'use client';
-
-import { useAuthStore } from '@/stores/useAuthStore';
-import { useAssistantStore } from '@/stores/useAssistantStore';
-import { useEffect, useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import SupportChatWidget from '@/components/SupportChatWidget';
 import CompanyForm from '@/components/CompanyForm';
-import { useRef } from 'react';
+import DashboardLayout from '@/components/layouts/DashLayout';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { useAssistantStore } from '@/stores/useAssistantStore';
 
+import HomePage from './pages/HomePage';
+import CompanyPage from './pages/CompanyPage';
+import ProductsPage from './pages/ProductsPage';
 
 export default function DashboardHome() {
   const { user, progress } = useAuthStore();
   const { sendMessage } = useAssistantStore();
   const [showCompanyForm, setShowCompanyForm] = useState(false);
-  const [hasTriggered, setHasTriggered] = useState(false);
-    const hasTriggeredRef = useRef(false); 
+  const [currentPage, setCurrentPage] = useState('home');
+  const hasTriggeredRef = useRef(false);
 
+  useEffect(() => {
+    if (!user || progress === undefined || hasTriggeredRef.current) return;
+    hasTriggeredRef.current = true;
 
+    if (!progress) {
+      setShowCompanyForm(true);
+      sendMessage({ stage: 'create_company', step: 'form_opened' });
+    } else {
+      sendMessage({ stage: progress.stage, step: 'resume' });
+    }
+  }, [user, progress]);
 
-useEffect(() => {
-  if (!user || progress === undefined || hasTriggeredRef.current) return;
-
-  hasTriggeredRef.current = true;
-
-  if (!progress) {
-    setShowCompanyForm(true);
-
-    sendMessage({
-      stage: 'create_company',
-      step: 'form_opened',
-    });
-  } else {
-    sendMessage({
-      stage: progress.stage,
-      step: 'resume',
-    });
-  }
-}, [user, progress]);
-
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'company': return <CompanyPage />;
+      case 'products': return <ProductsPage />;
+      default: return <HomePage />;
+    }
+  };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-      <p className="text-gray-600 mb-6">You're logged in via Facebook. 🎉</p>
-
+    <DashboardLayout>
+      {renderPage()}
       {showCompanyForm && <CompanyForm onClose={() => setShowCompanyForm(false)} />}
       <SupportChatWidget />
-    </div>
+    </DashboardLayout>
   );
 }
