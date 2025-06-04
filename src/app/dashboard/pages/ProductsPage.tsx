@@ -1,119 +1,559 @@
 // src\app\dashboard\pages\ProductsPage.tsx
+
 'use client';
 
-import { useItems } from '@/hooks/useItems';
 import { useState } from 'react';
+import { useItems } from '@/hooks/useItems';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Pencil, RefreshCwIcon, Package, Handshake } from 'lucide-react';
+import { PlusCircle, Package, Handshake, Pencil, SaveIcon, XIcon, Trash2, RefreshCw,} from 'lucide-react';
+import clsx from 'clsx';
+
+type ItemType = 'product' | 'service';
+interface RawItem {
+  _id?: string;
+  name: string;
+  type: ItemType;
+  category: string;
+  description: string;
+  painPoints: string[];
+  mainBenefits: string[];
+  features: string[];
+  useCases: string[];
+  targetAudience: string[];
+  dailyUsers: string[];
+  topCompetitors: string[];
+  pricePositioning: string;
+  price: number;
+  uniqueSellingPoints: string[];
+  image?: string;
+  featurePainMap?: { feature: string; solves: string }[];
+}
+
+// These two arrays drive BOTH edit-mode and display-mode rendering:
+const LEFT_FIELDS: Array<{
+  key: keyof RawItem;
+  label: string;
+  type: 'input' | 'textarea' | 'select';
+  placeholder?: string;
+  options?: ItemType[];
+}> = [
+  { key: 'image', label: 'Logo URL', type: 'input', placeholder: 'Image URL (opt.)' },
+  { key: 'name', label: 'Name', type: 'input', placeholder: 'Name' },
+  { key: 'type', label: 'Type', type: 'select', options: ['product', 'service'] },
+  { key: 'category', label: 'Category', type: 'input', placeholder: 'Category' },
+  { key: 'description', label: 'Description', type: 'textarea', placeholder: 'Short description' },
+  { key: 'painPoints', label: 'Pain Points', type: 'textarea', placeholder: 'Comma–separated' },
+  { key: 'mainBenefits', label: 'Benefits', type: 'textarea', placeholder: 'Comma–separated' },
+  { key: 'targetAudience', label: 'Target Audience', type: 'textarea', placeholder: 'Comma–separated' },
+  { key: 'dailyUsers', label: 'Users', type: 'textarea', placeholder: 'Comma–separated' },
+];
+
+const RIGHT_FIELDS: Array<{
+  key: keyof RawItem;
+  label: string;
+  type: 'input' | 'textarea';
+  placeholder?: string;
+}> = [
+  { key: 'features', label: 'Features', type: 'textarea', placeholder: 'Comma–separated' },
+  { key: 'useCases', label: 'Use Cases', type: 'textarea', placeholder: 'Comma–separated' },
+  { key: 'topCompetitors', label: 'Competitors', type: 'textarea', placeholder: 'Comma–separated' },
+  { key: 'pricePositioning', label: 'Positioning', type: 'input', placeholder: 'e.g. Premium' },
+  { key: 'price', label: 'Price ($)', type: 'input', placeholder: 'e.g. 49' },
+  { key: 'uniqueSellingPoints', label: 'USPs', type: 'textarea', placeholder: 'Comma–separated' },
+];
 
 export default function ProductsPage() {
   const { data, isLoading, error, refetch, isFetching } = useItems();
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editedItem, setEditedItem] = useState<{ name: string; type: 'product' | 'service' }>({
-    name: '',
-    type: 'product',
-  });
+  const [filter, setFilter] = useState<'all' | 'product' | 'service'>('all');
+  const [editModeId, setEditModeId] = useState<string | 'new' | null>(null);
 
-  const handleEditClick = (item: any) => {
-    setEditingId(item._id);
-    setEditedItem({ name: item.name, type: item.type });
+  // editedItem state holds *all* fields as comma-joined strings (for arrays)
+  const [editedItem, setEditedItem] = useState<Record<string, any>>({});
+
+  // When user clicks “Add New”
+  const handleAddClick = () => {
+    setEditModeId('new');
+    setEditedItem({
+      name: '',
+      type: 'product',
+      category: '',
+      description: '',
+      painPoints: '',
+      mainBenefits: '',
+      features: '',
+      useCases: '',
+      targetAudience: '',
+      dailyUsers: '',
+      topCompetitors: '',
+      pricePositioning: '',
+      price: '',
+      uniqueSellingPoints: '',
+      image: '',
+    });
   };
 
-  const handleSave = async () => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/sync/items`, {
-      method: 'PATCH',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ _id: editingId, ...editedItem }),
+  // When user clicks “Edit” on an existing item
+  const toggleEdit = (item: RawItem) => {
+    setEditModeId(item._id!);
+    // Flatten arrays into comma-strings
+    setEditedItem({
+      ...item,
+      painPoints: (item.painPoints || []).join(', '),
+      mainBenefits: (item.mainBenefits || []).join(', '),
+      features: (item.features || []).join(', '),
+      useCases: (item.useCases || []).join(', '),
+      targetAudience: (item.targetAudience || []).join(', '),
+      dailyUsers: (item.dailyUsers || []).join(', '),
+      topCompetitors: (item.topCompetitors || []).join(', '),
+      uniqueSellingPoints: (item.uniqueSellingPoints || []).join(', '),
+      price: item.price?.toString() || '',
+      image: item.image || '',
+      featurePainMap: item.featurePainMap
+        ?.map((f) => `${f.feature}=>${f.solves}`)
+        .join(', ') || '',
     });
+  };
 
-    if (res.ok) {
-      setEditingId(null);
+  // Unified onChange for any field
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setEditedItem((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Save (POST or PATCH depending on “new” vs existing)
+  const handleSave = async () => {
+    // Build payload: convert comma-strings into arrays or number
+    const payload: any = {};
+    for (const field of LEFT_FIELDS.concat(RIGHT_FIELDS)) {
+      const key = field.key as string;
+      const val = editedItem[key] ?? '';
+      if (
+        [
+          'painPoints',
+          'mainBenefits',
+          'features',
+          'useCases',
+          'targetAudience',
+          'dailyUsers',
+          'topCompetitors',
+          'uniqueSellingPoints',
+        ].includes(key)
+      ) {
+        payload[key] = (val as string)
+          .split(',')
+          .map((s) => s.trim())
+          .filter((x) => x);
+      } else if (key === 'price') {
+        payload.price = Number(val) || 0;
+      } else {
+        payload[key] = val;
+      }
+    }
+
+    let res;
+    if (editModeId === 'new') {
+      // POST to create
+      res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/sync/items`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } else {
+      // PATCH to update
+      res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/sync/items`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ _id: editModeId, ...payload }),
+      });
+    }
+
+    if (res?.ok) {
+      setEditModeId(null);
       refetch();
     } else {
-      alert('❌ Failed to update item');
+      alert('❌ Failed to save item');
     }
   };
 
-  if (isLoading) return <div className="p-4">Loading items...</div>;
-  if (error || !data) return <div className="p-4 text-red-500">Error loading items</div>;
+  // Delete an item
+  const handleDelete = async (id: string) => {
+    if (!confirm('Delete this item?')) return;
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/sync/items/${id}`,
+      {
+        method: 'DELETE',
+        credentials: 'include',
+      }
+    );
+    if (res.ok) {
+      refetch();
+    } else {
+      alert('❌ Failed to delete');
+    }
+  };
+
+  if (isLoading) return <div className="p-4">Loading items…</div>;
+  if (error || !data)
+    return <div className="p-4 text-red-500">Error loading items</div>;
+
+  // Filter data
+  const filteredData =
+    filter === 'all' ? data : data.filter((i: any) => i.type === filter);
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Your Offerings</h1>
+    <div className="p-6 max-w-screen-xl mx-auto space-y-6">
+      {/* HEADER: title + filters + Add new */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">🧠 Product &amp; Service Profiles</h1>
+        <div className="flex gap-2">
+          <Button
+            variant={filter === 'all' ? 'default' : 'outline'}
+            onClick={() => setFilter('all')}
+          >
+            All
+          </Button>
+          <Button
+            variant={filter === 'product' ? 'default' : 'outline'}
+            onClick={() => setFilter('product')}
+          >
+            Products
+          </Button>
+          <Button
+            variant={filter === 'service' ? 'default' : 'outline'}
+            onClick={() => setFilter('service')}
+          >
+            Services
+          </Button>
+          <Button onClick={handleAddClick} className="flex items-center gap-1">
+            <PlusCircle className="w-4 h-4" /> Add New
+          </Button>
+        </div>
+      </div>
 
-      {data.length === 0 ? (
-        <div className="text-gray-500">No items added yet.</div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {data.map((item: any) => {
-            const isEditing = editingId === item._id;
-            const Icon = item.type === 'product' ? Package : Handshake;
+      {/* If adding new: show a blank “edit” card first */}
+      {editModeId === 'new' && (
+        <Card className="rounded-2xl overflow-hidden shadow border">
+          <CardContent className="p-0">
+            {/* HEADER BAR */}
+            <div className="flex items-center justify-between bg-white p-4 border-b">
+              <div className="flex items-center gap-3">
+                <Package className="w-6 h-6 text-blue-600" />
+                <div>
+                  <div className="text-lg font-semibold">New Item</div>
+                  <div className="text-sm text-zinc-500">— | NEW</div>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setEditModeId(null)}
+                >
+                  <XIcon className="w-4 h-4" />
+                </Button>
+                <Button size="sm" onClick={handleSave}>
+                  <SaveIcon className="w-4 h-4 mr-1" /> Save
+                </Button>
+              </div>
+            </div>
 
-            return (
-              <Card key={item._id}>
-                <CardContent className="p-4 space-y-2">
-                  <div className="flex items-center gap-3">
-                    <Icon className="w-6 h-6 text-blue-600" />
-                    {isEditing ? (
+            {/* FORM GRID */}
+            <div className="p-6 grid md:grid-cols-2 gap-6 text-sm">
+              {/* LEFT COLUMN */}
+              <div className="space-y-4">
+                {LEFT_FIELDS.map(({ key, label, type, placeholder, options }) => (
+                  <div key={key} className="flex flex-col gap-1">
+                    <label htmlFor={key} className="text-xs font-semibold">
+                      {label}
+                    </label>
+                    {type === 'input' && (
                       <Input
-                        value={editedItem.name}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                          setEditedItem({ ...editedItem, name: e.target.value })
-                        }
+                        id={key}
+                        name={key}
+                        value={editedItem[key] || ''}
+                        onChange={handleChange}
+                        placeholder={placeholder}
                       />
-                    ) : (
-                      <h2 className="font-semibold">{item.name}</h2>
+                    )}
+                    {type === 'textarea' && (
+                      <Textarea
+                        id={key}
+                        name={key}
+                        value={editedItem[key] || ''}
+                        onChange={handleChange}
+                        placeholder={placeholder}
+                      />
+                    )}
+                    {type === 'select' && options && (
+                      <select
+                        id={key}
+                        name={key}
+                        value={editedItem[key]}
+                        onChange={handleChange}
+                        className="bg-white text-black rounded px-2 py-1"
+                      >
+                        {options.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                          </option>
+                        ))}
+                      </select>
                     )}
                   </div>
+                ))}
+              </div>
 
-                  {isEditing ? (
-                    <select
-                      value={editedItem.type}
-                      onChange={(e) =>
-                        setEditedItem({
-                          ...editedItem,
-                          type: e.target.value as 'product' | 'service',
-                        })
-                      }
-                      className="border p-2 rounded w-full"
-                    >
-                      <option value="product">Product</option>
-                      <option value="service">Service</option>
-                    </select>
-                  ) : (
-                    <span className="text-sm text-gray-500 capitalize">{item.type}</span>
-                  )}
+              {/* RIGHT COLUMN */}
+              <div className="space-y-4">
+                {RIGHT_FIELDS.map(({ key, label, type, placeholder }) => (
+                  <div key={key} className="flex flex-col gap-1">
+                    <label htmlFor={key} className="text-xs font-semibold">
+                      {label}
+                    </label>
+                    {type === 'input' && (
+                      <Input
+                        id={key}
+                        name={key}
+                        value={editedItem[key] || ''}
+                        onChange={handleChange}
+                        placeholder={placeholder}
+                      />
+                    )}
+                    {type === 'textarea' && (
+                      <Textarea
+                        id={key}
+                        name={key}
+                        value={editedItem[key] || ''}
+                        onChange={handleChange}
+                        placeholder={placeholder}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
-                  <div className="flex justify-end gap-2">
-                    {isEditing ? (
-                      <Button size="sm" onClick={handleSave}>
-                        ✅ Save
-                      </Button>
-                    ) : (
+      {/* LIST OF EXISTING ITEMS */}
+      {filteredData.map((item: any) => {
+        const isEditing = editModeId === item._id;
+        const Icon = (item.type === 'product' ? Package : Handshake) as any;
+
+        return (
+          <Card
+            key={item._id}
+            className="rounded-2xl overflow-hidden shadow border"
+          >
+            <CardContent className="p-0">
+              {/* HEADER BAR */}
+              <div className="flex items-center justify-between bg-white p-4 border-b">
+                <div className="flex items-center gap-3">
+                  <Icon className="w-6 h-6 text-blue-600" />
+                  <div>
+                    {!isEditing && (
+                      <>
+                        <div className="text-lg font-semibold">{item.name}</div>
+                        <div className="text-sm text-zinc-500">
+                          {item.category || '—'} | {item.type.toUpperCase()}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  {!isEditing && (
+                    <>
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleEditClick(item)}
-                        className="flex items-center gap-1"
+                        onClick={() => toggleEdit(item)}
                       >
-                        <Pencil className="w-3 h-3" /> Edit
+                        <Pencil className="w-4 h-4 mr-1" /> Edit
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDelete(item._id)}
+                      >
+                        <Trash2 className="w-4 h-4 mr-1" /> Delete
+                      </Button>
+                    </>
+                  )}
+                  {isEditing && (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setEditModeId(null)}
+                      >
+                        <XIcon className="w-4 h-4" />
+                      </Button>
+                      <Button size="sm" onClick={handleSave}>
+                        <SaveIcon className="w-4 h-4 mr-1" /> Save
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* EDIT MODE FORM or DISPLAY MODE */}
+              {isEditing ? (
+                <div className="p-6 grid md:grid-cols-2 gap-6 text-sm">
+                  {/* Reuse the same LEFT_FIELDS / RIGHT_FIELDS logic */}
+                  <div className="space-y-4">
+                    {LEFT_FIELDS.map(({ key, label, type, placeholder, options }) => (
+                      <div key={key} className="flex flex-col gap-1">
+                        <label htmlFor={key} className="text-xs font-semibold">
+                          {label}
+                        </label>
+                        {type === 'input' && (
+                          <Input
+                            id={key}
+                            name={key}
+                            value={editedItem[key] || ''}
+                            onChange={handleChange}
+                            placeholder={placeholder}
+                          />
+                        )}
+                        {type === 'textarea' && (
+                          <Textarea
+                            id={key}
+                            name={key}
+                            value={editedItem[key] || ''}
+                            onChange={handleChange}
+                            placeholder={placeholder}
+                          />
+                        )}
+                        {type === 'select' && options && (
+                          <select
+                            id={key}
+                            name={key}
+                            value={editedItem[key]}
+                            onChange={handleChange}
+                            className="bg-white text-black rounded px-2 py-1"
+                          >
+                            {options.map((opt) => (
+                              <option key={opt} value={opt}>
+                                {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-4">
+                    {RIGHT_FIELDS.map(({ key, label, type, placeholder }) => (
+                      <div key={key} className="flex flex-col gap-1">
+                        <label htmlFor={key} className="text-xs font-semibold">
+                          {label}
+                        </label>
+                        {type === 'input' && (
+                          <Input
+                            id={key}
+                            name={key}
+                            value={editedItem[key] || ''}
+                            onChange={handleChange}
+                            placeholder={placeholder}
+                          />
+                        )}
+                        {type === 'textarea' && (
+                          <Textarea
+                            id={key}
+                            name={key}
+                            value={editedItem[key] || ''}
+                            onChange={handleChange}
+                            placeholder={placeholder}
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="p-6 grid md:grid-cols-2 gap-6 text-sm">
+                  {/* LEFT DISPLAY */}
+                  <div className="space-y-2">
+                    <h3 className="text-blue-700 font-bold uppercase text-xs">
+                      🎯 Audience &amp; Benefits
+                    </h3>
+                    <p>
+                      <strong>🎯 Target:</strong>{' '}
+                      {(item.targetAudience || []).join(', ') || '—'}
+                    </p>
+                    <p>
+                      <strong>👥 Users:</strong> {(item.dailyUsers || []).join(', ') ||
+                        '—'}
+                    </p>
+                    <p>
+                      <strong>🥵 Pain:</strong> {(item.painPoints || []).join(', ') ||
+                        '—'}
+                    </p>
+                    <p>
+                      <strong>🚀 Benefits:</strong> {(item.mainBenefits || []).join(', ') ||
+                        '—'}
+                    </p>
+                    <p>
+                      <strong>📝 Description:</strong> {item.description || '—'}
+                    </p>
+                    <p>
+                      <strong>🏷 Category:</strong> {item.category || '—'}
+                    </p>
+                    {item.image && (
+                      <img
+                        src={item.image}
+                        alt="product preview"
+                        className="w-full max-w-xs rounded mt-2"
+                      />
                     )}
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
 
-      <Button onClick={() => refetch()} className="flex items-center gap-2">
-        <RefreshCwIcon className="w-4 h-4" />
-        Refresh
-        {isFetching && '...'}
+                  {/* RIGHT DISPLAY */}
+                  <div className="space-y-2">
+                    <h3 className="text-blue-700 font-bold uppercase text-xs">
+                      🧩 Features &amp; Positioning
+                    </h3>
+                    <p>
+                      <strong>🔧 Features:</strong> {(item.features || []).join(', ') ||
+                        '—'}
+                    </p>
+                    <p>
+                      <strong>📌 Use Cases:</strong> {(item.useCases || []).join(', ') ||
+                        '—'}
+                    </p>
+                    <p>
+                      <strong>⚔ Competitors:</strong> {(item.topCompetitors ||
+                        []).join(', ') || '—'}
+                    </p>
+                    <p>
+                      <strong>💰 Position:</strong> {item.pricePositioning || '—'}{' '}
+                      - ${item.price ?? '—'}
+                    </p>
+                    <p>
+                      <strong>✨ USPs:</strong> {(item.uniqueSellingPoints ||
+                        []).join(', ') || 'No USPs yet'}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        );
+      })}
+
+      {/* REFRESH BUTTON */}
+      <Button onClick={() => refetch()} className="mt-6 flex items-center gap-2">
+        <RefreshCw className="w-4 h-4" /> Refresh {isFetching && '...'}
       </Button>
     </div>
   );
