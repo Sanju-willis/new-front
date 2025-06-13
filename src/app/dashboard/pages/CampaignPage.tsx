@@ -2,20 +2,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Card, CardContent, Badge, Tabs, TabsList, TabsTrigger, TabsContent, BarChart,} from '@/components/ui';
 import { Eye, MousePointerClick, DollarSign } from 'lucide-react';
-import { BarChart } from '@/components/ui/BarChart';
 import { apiPage } from '@/helpers/apiPages';
-import type {
-  Campaign,
-  AdSet,
-  Ad,
-  AdCreative,
-  Insight,
-  Item,
-} from '@/types/campaignPage';
+import type { Campaign, AdSet, Ad, AdCreative, Insight, Item,} from '@/types/campaignPage';
 
 
 export default function CampaignPage() {

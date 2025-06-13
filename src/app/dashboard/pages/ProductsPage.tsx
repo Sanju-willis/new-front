@@ -3,10 +3,7 @@
 
 import { useState } from 'react';
 import { useItems } from '@/hooks/useItems';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, Input, Textarea, Button,} from '@/components/ui';
 import { PlusCircle, Package, Handshake, Pencil, SaveIcon, XIcon, Trash2, RefreshCw,} from 'lucide-react';
 import clsx from 'clsx';
 import type { ItemType, RawItem } from '@/types/item';

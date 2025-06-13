@@ -3,16 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useCompanyData } from '@/hooks/useCompanyData';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, Input, Textarea, Button,} from '@/components/ui';
 import { Loader2 } from 'lucide-react';
 import { apiPage } from '@/helpers/apiPages'; // at the top
 
