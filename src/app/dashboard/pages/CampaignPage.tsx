@@ -6,21 +6,17 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Eye, MousePointerClick, DollarSign } from 'lucide-react';
-import { BarChart } from '@/components/BarChart';
+import { BarChart } from '@/components/ui/BarChart';
 import { apiPage } from '@/helpers/apiPages';
+import type {
+  Campaign,
+  AdSet,
+  Ad,
+  AdCreative,
+  Insight,
+  Item,
+} from '@/types/campaignPage';
 
-
-interface Campaign {
-  _id: string;
-  name: string;
-  objective: string;
-  itemId?: string;
-}
-interface AdSet { _id: string; name: string; campaignId: string; }
-interface Ad { _id: string; name: string; adSetId: string; }
-interface AdCreative { _id: string; title: string; adId: string; }
-interface Insight { _id: string; adId: string; impressions: number; clicks: number; spend: number; }
-interface Item { _id: string; name: string; type: string; }
 
 export default function CampaignPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);

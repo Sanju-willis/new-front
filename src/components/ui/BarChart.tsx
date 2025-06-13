@@ -1,4 +1,4 @@
-// src\components\BarChart.tsx
+// src\components\ui\BarChart.tsx
 'use client';
 import { BarChart as ReBarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 

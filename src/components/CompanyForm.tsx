@@ -12,6 +12,8 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem} from '@/
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { CompanyFormType } from '@/types/companyFormTypes';
+import { apiForm } from '@/helpers/apiForm';
+
 
 
 const industries = ['SaaS', 'E-commerce', 'Healthcare', 'Fintech'];
@@ -61,21 +63,14 @@ export default function CompanyForm({ onClose }: { onClose: () => void }) {
   const handleBack = () => setStep(prev => prev - 1);
 
   const handleSubmit = async () => {
-    try {
-      const cleanedItems = form.items.filter(item => item.name.trim() !== '');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/onboard/company`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ ...form, items: cleanedItems }),
-      });
-      if (!res.ok) throw new Error('Submit failed');
-      await fetchUser();
-      onClose();
-    } catch (err) {
-      console.error('❌ Error:', err);
-    }
-  };
+  try {
+    await apiForm.submitCompanyForm(form);
+    await fetchUser();
+    onClose();
+  } catch (err) {
+    console.error('❌ Error:', err);
+  }
+};
 
   const renderStep = () => {
     switch (step) {

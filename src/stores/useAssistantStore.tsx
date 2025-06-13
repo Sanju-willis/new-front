@@ -1,11 +1,11 @@
 // src\stores\useAssistantStore.tsx
 import { create } from 'zustand';
-import { api } from '@/helpers/apiStores'; 
+import { api } from '@/helpers/apiStores';
 
 interface AssistantMessagePayload {
-  input?: string | null;
-  stage?: string | null;
-  step?: string | null;
+  input?: string;
+  stage?: string;
+  step?: string;
 }
 
 interface AssistantState {
@@ -13,26 +13,18 @@ interface AssistantState {
   sendMessage: (payload: AssistantMessagePayload) => void;
 }
 
-
 export const useAssistantStore = create<AssistantState>((set) => ({
   messages: [],
 
-  sendMessage: async ({ input = '', stage = '', step = '' }) => {
-    // Add user message only if it exists
-    if (input)
+  sendMessage: async ({ input, stage, step }) => {
+    if (input) {
       set((state) => ({
         messages: [...state.messages, `🧑‍💻: ${input}`],
       }));
+    }
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ input, stage, step }),
-      });
-
-      const data = await res.json();
+      const data = await api.sendAssistantMessage({ input, stage, step });
 
       set((state) => ({
         messages: [...state.messages, `🤖: ${data.reply}`],

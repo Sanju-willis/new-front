@@ -1,5 +1,4 @@
 // src\types\companyFormTypes.ts
-// src/types/companyFormTypes.ts
 
 export type CompanyItem = {
   name: string;
