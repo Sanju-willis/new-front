@@ -15,31 +15,39 @@ updateCompany: async (payload: Record<string, any>) => {
   if (!res.ok) throw new Error('❌ Failed to update company');
   return res.json();
 },
+
 // Items Page
 
-  createItem: async (payload: any) => {
-    return fetch(`${BASE_URL}/sync/items`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-  },
-  updateItem: async (_id: string, payload: any) => {
-    return fetch(`${BASE_URL}/sync/items`, {
-      method: 'PATCH',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ _id, ...payload }),
-    });
-  },
+ createItem: async (payload: any) => {
+  const res = await fetch(`${BASE_URL}/sync/items`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error('❌ Failed to create item');
+  return res.json();
+},
 
-  deleteItem: async (id: string) => {
-    return fetch(`${BASE_URL}/sync/items/${id}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    });
-  },
+updateItem: async (_id: string, payload: any) => {
+  const res = await fetch(`${BASE_URL}/sync/items`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ _id, ...payload }),
+  });
+  if (!res.ok) throw new Error('❌ Failed to update item');
+  return res.json();
+},
+
+deleteItem: async (id: string) => {
+  const res = await fetch(`${BASE_URL}/sync/items/${id}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error('❌ Failed to delete item');
+  return res.json();
+},
 
 
   // Campaigns Page
