@@ -180,7 +180,6 @@ export default function ProductsPage() {
   onAddClick={handleAddClick}
 />
 
-
       {/* If adding new: show a blank “edit” card first */}
       {editModeId === 'new' && (
         <Card className="rounded-2xl overflow-hidden shadow border">
