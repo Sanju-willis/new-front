@@ -1,5 +1,6 @@
 // src\stores\useAssistantStore.tsx
 import { create } from 'zustand';
+import { api } from '@/helpers/apiStores'; 
 
 interface AssistantMessagePayload {
   input?: string | null;

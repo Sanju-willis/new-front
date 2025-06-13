@@ -12,8 +12,7 @@ import { PlusCircle, Package, Handshake, Pencil, SaveIcon, XIcon, Trash2, Refres
 import clsx from 'clsx';
 import type { ItemType, RawItem } from '@/types/item';
 import { ProductFilterBar } from '@/components/products/ProductFilterBar';
-
-
+import { apiPage } from '@/helpers/apiPages';
 
 
 // These two arrays drive BOTH edit-mode and display-mode rendering:
@@ -141,21 +140,9 @@ export default function ProductsPage() {
 
     let res;
     if (editModeId === 'new') {
-      // POST to create
-      res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/sync/items`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-    } else {
-      // PATCH to update
-      res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/sync/items`, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ _id: editModeId, ...payload }),
-      });
+      res = await apiPage.createItem(payload); // ✅ POST
+    } else if (editModeId && editModeId !== 'new') {
+      res = await apiPage.updateItem(editModeId, payload); // ✅ PATCH
     }
 
     if (res?.ok) {
@@ -165,17 +152,11 @@ export default function ProductsPage() {
       alert('❌ Failed to save item');
     }
   };
-
   // Delete an item
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this item?')) return;
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/sync/items/${id}`,
-      {
-        method: 'DELETE',
-        credentials: 'include',
-      }
-    );
+    const res = await apiPage.deleteItem(id); // ✅ helper used
+
     if (res.ok) {
       refetch();
     } else {

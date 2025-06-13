@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Eye, MousePointerClick, DollarSign } from 'lucide-react';
 import { BarChart } from '@/components/BarChart';
+import { apiPage } from '@/helpers/apiPages';
+
 
 interface Campaign {
   _id: string;
@@ -32,30 +34,24 @@ export default function CampaignPage() {
 
   useEffect(() => {
     async function fetchAll() {
-      setLoading(true);
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/campaigns/overview`, {
-          credentials: 'include',
-        });
-        const { campaigns: c, adSets: aS, ads: a, creatives: cr, insights: i } = await res.json();
+  setLoading(true);
+  try {
+    const { campaigns: c, adSets: aS, ads: a, creatives: cr, insights: i } =
+      await apiPage.fetchCampaignOverview();
 
-        const itemsRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/sync/items`, {
-          credentials: 'include',
-        });
-        const itemsJson = await itemsRes.json();
+    const itemsJson = await apiPage.fetchItems();
 
-        setCampaigns(c);
-        setAdSets(aS);
-        setAds(a);
-        setCreatives(cr);
-        setInsights(i);
-        setItems(itemsJson);
-      } catch (err) {
-        console.error('Error fetching campaign data:', err);
-      }
-      setLoading(false);
-    }
-
+    setCampaigns(c);
+    setAdSets(aS);
+    setAds(a);
+    setCreatives(cr);
+    setInsights(i);
+    setItems(itemsJson);
+  } catch (err) {
+    console.error('Error fetching campaign data:', err);
+  }
+  setLoading(false);
+}
     fetchAll();
   }, []);
 
@@ -167,20 +163,10 @@ export default function CampaignPage() {
                     <select
                       className="border rounded px-2 py-1 text-sm"
                       value={camp.itemId || ''}
-                      onChange={async (e) => {
+                       onChange={async (e) => {
                         const itemId = e.target.value;
                         try {
-                          const res = await fetch(
-                            `${process.env.NEXT_PUBLIC_BACKEND_URL}/campaigns/${camp._id}/item`,
-                            {
-                              method: 'PATCH',
-                              headers: { 'Content-Type': 'application/json' },
-                              credentials: 'include',
-                              body: JSON.stringify({ itemId }),
-                            }
-                          );
-                          if (!res.ok) throw new Error('Update failed');
-                          const updated = await res.json();
+                          const updated = await apiPage.attachItemToCampaign(camp._id, itemId);
                           setCampaigns((prev) =>
                             prev.map((c) =>
                               c._id === updated._id ? { ...c, itemId: updated.itemId } : c

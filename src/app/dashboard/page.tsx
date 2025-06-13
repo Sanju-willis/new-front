@@ -35,7 +35,7 @@ export default function DashboardHome() {
     switch (currentPage) {
       case 'company': return <CompanyPage />;
       case 'products': return <ProductsPage />;
-          case 'campaigns': return <CampaignPage />; // ← Add this line
+      case 'campaigns': return <CampaignPage />; // ← Add this line
       default: return <HomePage />;
     }
   };

@@ -1,6 +1,6 @@
 // src\stores\useAuthStore.tsx
 import { create } from 'zustand';
-
+import { api } from '@/helpers/apiStores'
 
 type Progress = {
   company: string;
@@ -32,13 +32,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   fetchUser: async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`, {
-        credentials: 'include',
-      });
-
-      if (!res.ok) throw new Error('Failed to fetch user');
-
-      const data = await res.json();
+      const data = await api.fetchUser(); // ✅ call centralized helper
 
       set({
         user: data.user,

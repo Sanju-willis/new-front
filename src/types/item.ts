@@ -1,5 +1,4 @@
 // src\types\item.ts
-// src/types/item.ts
 
 export type ItemType = 'product' | 'service';
 

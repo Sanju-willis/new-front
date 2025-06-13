@@ -14,6 +14,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
+import { apiPage } from '@/helpers/apiPages'; // at the top
+
 
 export default function CompanyPage() {
   const { data, isLoading, error, refetch, isFetching } = useCompanyData();
@@ -45,17 +47,16 @@ export default function CompanyPage() {
     }
   }, [data]);
 
-  const handleUpdate = async () => {
-    setStatus('saving');
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/patch/company`, {
-      method: 'PATCH',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
-    setStatus(res.ok ? 'success' : 'error');
-    if (res.ok) await refetch();
-  };
+ const handleUpdate = async () => {
+  setStatus('saving');
+  try {
+    await apiPage.updateCompany(form); // ✅ use helper function
+    setStatus('success');
+    await refetch();
+  } catch {
+    setStatus('error');
+  }
+};
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
