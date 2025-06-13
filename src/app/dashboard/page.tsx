@@ -6,9 +6,8 @@ import CompanyForm from '@/components/CompanyForm';
 import DashboardLayout from '@/components/layouts/DashLayout';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useAssistantStore } from '@/stores/useAssistantStore';
+
 import CampaignPage from './pages/CampaignPage'; // ← Add this
-
-
 import HomePage from './pages/HomePage';
 import CompanyPage from './pages/CompanyPage';
 import ProductsPage from './pages/ProductsPage';

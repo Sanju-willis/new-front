@@ -10,27 +10,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Package, Handshake, Pencil, SaveIcon, XIcon, Trash2, RefreshCw,} from 'lucide-react';
 import clsx from 'clsx';
+import type { ItemType, RawItem } from '@/types/item';
+import { ProductFilterBar } from '@/components/products/ProductFilterBar';
 
-type ItemType = 'product' | 'service';
-interface RawItem {
-  _id?: string;
-  name: string;
-  type: ItemType;
-  category: string;
-  description: string;
-  painPoints: string[];
-  mainBenefits: string[];
-  features: string[];
-  useCases: string[];
-  targetAudience: string[];
-  dailyUsers: string[];
-  topCompetitors: string[];
-  pricePositioning: string;
-  price: number;
-  uniqueSellingPoints: string[];
-  image?: string;
-  featurePainMap?: { feature: string; solves: string }[];
-}
+
+
 
 // These two arrays drive BOTH edit-mode and display-mode rendering:
 const LEFT_FIELDS: Array<{
@@ -209,33 +193,12 @@ export default function ProductsPage() {
 
   return (
     <div className="p-6 max-w-screen-xl mx-auto space-y-6">
-      {/* HEADER: title + filters + Add new */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">🧠 Product &amp; Service Profiles</h1>
-        <div className="flex gap-2">
-          <Button
-            variant={filter === 'all' ? 'default' : 'outline'}
-            onClick={() => setFilter('all')}
-          >
-            All
-          </Button>
-          <Button
-            variant={filter === 'product' ? 'default' : 'outline'}
-            onClick={() => setFilter('product')}
-          >
-            Products
-          </Button>
-          <Button
-            variant={filter === 'service' ? 'default' : 'outline'}
-            onClick={() => setFilter('service')}
-          >
-            Services
-          </Button>
-          <Button onClick={handleAddClick} className="flex items-center gap-1">
-            <PlusCircle className="w-4 h-4" /> Add New
-          </Button>
-        </div>
-      </div>
+      <ProductFilterBar
+  currentFilter={filter}
+  onFilterChange={setFilter}
+  onAddClick={handleAddClick}
+/>
+
 
       {/* If adding new: show a blank “edit” card first */}
       {editModeId === 'new' && (
