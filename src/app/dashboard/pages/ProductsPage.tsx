@@ -1,5 +1,4 @@
 // src\app\dashboard\pages\ProductsPage.tsx
-
 'use client';
 
 import { useState } from 'react';
