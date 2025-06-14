@@ -3,12 +3,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { useAssistantStore } from '@/stores/useAssistantStore';
+import { useAuthStore, useAssistantStore } from '@/stores';
 import { Input, Button, Textarea , Select, SelectTrigger, SelectValue, SelectContent, SelectItem, ScrollArea} from '@/components/ui';
 import { cn } from '@/lib/utils';
 import { CompanyFormType } from '@/types/companyFormTypes';
 import { apiForm } from '@/helpers/apiForm';
+import { defaultCompanyForm } from '@/constants/defaultCompanyForm';
 
 
 const industries = ['SaaS', 'E-commerce', 'Healthcare', 'Fintech'];
@@ -21,30 +21,56 @@ export default function CompanyForm({ onClose }: { onClose: () => void }) {
   const { fetchUser } = useAuthStore();
   const { sendMessage } = useAssistantStore();
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState({
-    companyName: '', size: '', industry: '', type: '', targetMarket: '',
-    address: '', website: '', socialLinks: [''], brandGuideUrl: '',
-    logoAssetsUrl: '', pressKitUrl: '', portfolioUrl: '',
-    contentLibraryUrl: '', productPages: [''], userRole: '',
-    description: '', targetAudience: '',
-    items: [{ name: '', type: 'product' as 'product' | 'service' }],
+  const [form, setForm] = useState<CompanyFormType>(defaultCompanyForm);
+  
+ const handleChange = async (
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+) => {
+  const { name, value } = e.target;
+  const updatedForm = { ...form, [name]: value };
+  setForm(updatedForm);
+
+  await sendMessage({
+    input: `${name}: ${value}`,
+    step: `step_${step}`,
+    stage: 'create_company',
   });
+};
 
-  const handleChange = (e: React.ChangeEvent<any>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+const handleListChange = async (
+  index: number,
+  value: string,
+  key: 'socialLinks' | 'productPages'
+) => {
+  const updated = [...form[key]];
+  updated[index] = value;
+  const updatedForm = { ...form, [key]: updated };
+  setForm(updatedForm);
 
-  const handleListChange = (index: number, value: string, key: 'socialLinks' | 'productPages') => {
-    const updated = [...form[key]];
-    updated[index] = value;
-    setForm({ ...form, [key]: updated });
-  };
+  await sendMessage({
+    input: `${key}[${index}]: ${value}`,
+    step: `step_${step}`,
+    stage: 'create_company',
+  });
+};
 
-  const handleItemChange = (index: number, field: 'name' | 'type', value: string) => {
-    const updated = [...form.items];
-    updated[index][field] = value as 'product' | 'service';
-    setForm({ ...form, items: updated });
-  };
+const handleItemChange = async (
+  index: number,
+  field: 'name' | 'type',
+  value: string
+) => {
+  const updated = [...form.items];
+  updated[index][field] = value as 'product' | 'service';
+  const updatedForm = { ...form, items: updated };
+  setForm(updatedForm);
+
+  await sendMessage({
+    input: `Item[${index}].${field}: ${value}`,
+    step: `step_${step}`,
+    stage: 'create_company',
+  });
+};
+
 
   const handleAddField = (key: 'socialLinks' | 'productPages' | 'items') => {
     if (key === 'items') {

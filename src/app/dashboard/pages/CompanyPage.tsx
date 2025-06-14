@@ -1,3 +1,4 @@
+// src\app\dashboard\pages\CompanyPage.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
