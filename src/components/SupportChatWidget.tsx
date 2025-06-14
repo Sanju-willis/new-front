@@ -1,3 +1,4 @@
+// src\components\SupportChatWidget.tsx
 'use client';
 
 import { useAssistantStore } from '@/stores/useAssistantStore';
