@@ -30,7 +30,7 @@ updateCompany: async (payload: Record<string, any>) => {
 },
 
 updateItem: async (_id: string, payload: any) => {
-  const res = await fetch(`${BASE_URL}/sync/items`, {
+  const res = await fetch(`${BASE_URL}/sync/items/${_id}`, {
     method: 'PATCH',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
