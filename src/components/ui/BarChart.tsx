@@ -4,7 +4,7 @@ import { BarChart as ReBarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer
 
 type BarChartProps = {
   data: { adId: string; impressions: number; clicks: number; spend: number }[];
-  metric: 'spend' | 'clicks';
+  metric: 'spend' | 'clicks' | 'reach' | 'ctr' | 'cpm';
 };
 
 export function BarChart({ data, metric }: BarChartProps) {

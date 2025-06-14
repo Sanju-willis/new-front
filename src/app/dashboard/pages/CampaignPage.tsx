@@ -2,11 +2,33 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, Badge, Tabs, TabsList, TabsTrigger, TabsContent, BarChart,} from '@/components/ui';
-import { Eye, MousePointerClick, DollarSign } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  Badge,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  BarChart,
+} from '@/components/ui';
+import {
+  Eye,
+  MousePointerClick,
+  DollarSign,
+  BarChart3,
+  Users,
+  Percent,
+} from 'lucide-react';
 import { apiPage } from '@/helpers/apiPages';
-import type { Campaign, AdSet, Ad, AdCreative, Insight, Item,} from '@/types/campaignPage';
-
+import type {
+  Campaign,
+  AdSet,
+  Ad,
+  AdCreative,
+  Insight,
+  Item,
+} from '@/types/campaignPage';
 
 export default function CampaignPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -20,24 +42,24 @@ export default function CampaignPage() {
 
   useEffect(() => {
     async function fetchAll() {
-  setLoading(true);
-  try {
-    const { campaigns: c, adSets: aS, ads: a, creatives: cr, insights: i } =
-      await apiPage.fetchCampaignOverview();
+      setLoading(true);
+      try {
+        const { campaigns: c, adSets: aS, ads: a, creatives: cr, insights: i } =
+          await apiPage.fetchCampaignOverview();
 
-    const itemsJson = await apiPage.fetchItems();
+        const itemsJson = await apiPage.fetchItems();
 
-    setCampaigns(c);
-    setAdSets(aS);
-    setAds(a);
-    setCreatives(cr);
-    setInsights(i);
-    setItems(itemsJson);
-  } catch (err) {
-    console.error('Error fetching campaign data:', err);
-  }
-  setLoading(false);
-}
+        setCampaigns(c);
+        setAdSets(aS);
+        setAds(a);
+        setCreatives(cr);
+        setInsights(i);
+        setItems(itemsJson);
+      } catch (err) {
+        console.error('Error fetching campaign data:', err);
+      }
+      setLoading(false);
+    }
     fetchAll();
   }, []);
 
@@ -46,8 +68,11 @@ export default function CampaignPage() {
       impressions: acc.impressions + i.impressions,
       clicks: acc.clicks + i.clicks,
       spend: acc.spend + i.spend,
+      reach: acc.reach + (i.reach || 0),
+      ctr: acc.ctr + (i.ctr || 0),
+      cpm: acc.cpm + (i.cpm || 0),
     }),
-    { impressions: 0, clicks: 0, spend: 0 }
+    { impressions: 0, clicks: 0, spend: 0, reach: 0, ctr: 0, cpm: 0 }
   );
 
   const filteredCampaigns =
@@ -58,6 +83,9 @@ export default function CampaignPage() {
     impressions: i.impressions,
     clicks: i.clicks,
     spend: i.spend,
+    reach: i.reach,
+    ctr: i.ctr,
+    cpm: i.cpm,
   }));
 
   if (loading) return <div className="p-4">Loading campaign data...</div>;
@@ -96,6 +124,36 @@ export default function CampaignPage() {
             </div>
           </CardContent>
         </Card>
+        <Card>
+          <CardContent className="p-4 flex items-center gap-2">
+            <Users />
+            <div>
+              <strong>Reach</strong>
+              <br />
+              {total.reach}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 flex items-center gap-2">
+            <Percent />
+            <div>
+              <strong>CTR</strong>
+              <br />
+              {total.ctr.toFixed(2)}%
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 flex items-center gap-2">
+            <BarChart3 />
+            <div>
+              <strong>CPM</strong>
+              <br />
+              ${total.cpm.toFixed(2)}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
@@ -103,6 +161,9 @@ export default function CampaignPage() {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="spend">Spend</TabsTrigger>
           <TabsTrigger value="engagement">Engagement</TabsTrigger>
+          <TabsTrigger value="reach">Reach</TabsTrigger>
+          <TabsTrigger value="ctr">CTR</TabsTrigger>
+          <TabsTrigger value="cpm">CPM</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
@@ -149,13 +210,18 @@ export default function CampaignPage() {
                     <select
                       className="border rounded px-2 py-1 text-sm"
                       value={camp.itemId || ''}
-                       onChange={async (e) => {
+                      onChange={async (e) => {
                         const itemId = e.target.value;
                         try {
-                          const updated = await apiPage.attachItemToCampaign(camp._id, itemId);
+                          const updated = await apiPage.attachItemToCampaign(
+                            camp._id,
+                            itemId
+                          );
                           setCampaigns((prev) =>
                             prev.map((c) =>
-                              c._id === updated._id ? { ...c, itemId: updated.itemId } : c
+                              c._id === updated._id
+                                ? { ...c, itemId: updated.itemId }
+                                : c
                             )
                           );
                         } catch (err) {
@@ -193,7 +259,8 @@ export default function CampaignPage() {
                                   {insight ? (
                                     <>
                                       Insights: Impressions {insight.impressions}, Clicks{' '}
-                                      {insight.clicks}, Spend ${insight.spend}
+                                      {insight.clicks}, Spend ${insight.spend}, Reach{' '}
+                                      {insight.reach}, CTR {insight.ctr}%, CPM ${insight.cpm}
                                     </>
                                   ) : (
                                     'No insights'
@@ -216,6 +283,18 @@ export default function CampaignPage() {
 
         <TabsContent value="engagement">
           <BarChart data={chartData} metric="clicks" />
+        </TabsContent>
+
+        <TabsContent value="reach">
+          <BarChart data={chartData} metric="reach" />
+        </TabsContent>
+
+        <TabsContent value="ctr">
+          <BarChart data={chartData} metric="ctr" />
+        </TabsContent>
+
+        <TabsContent value="cpm">
+          <BarChart data={chartData} metric="cpm" />
         </TabsContent>
       </Tabs>
     </div>

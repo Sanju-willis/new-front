@@ -30,6 +30,10 @@ export interface Insight {
   impressions: number;
   clicks: number;
   spend: number;
+  reach?: number;
+  ctr?: number;
+  cpm?: number;
+  date?: string;
 }
 
 export interface Item {
