@@ -6,7 +6,7 @@ export type CompanyItem = {
 };
 
 export type CompanyFormType = {
-  name: string;
+  companyName: string;
   size: string;
   industry: string;
   type: string;

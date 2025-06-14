@@ -22,7 +22,7 @@ export default function CompanyForm({ onClose }: { onClose: () => void }) {
   const { sendMessage } = useAssistantStore();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
-    name: '', size: '', industry: '', type: '', targetMarket: '',
+    companyName: '', size: '', industry: '', type: '', targetMarket: '',
     address: '', website: '', socialLinks: [''], brandGuideUrl: '',
     logoAssetsUrl: '', pressKitUrl: '', portfolioUrl: '',
     contentLibraryUrl: '', productPages: [''], userRole: '',
@@ -72,7 +72,7 @@ export default function CompanyForm({ onClose }: { onClose: () => void }) {
       case 1:
         return (
           <div className="space-y-3">
-            <Input name="name" placeholder="Company Name" value={form.name} onChange={handleChange} />
+            <Input name="companyName" placeholder="Company Name" value={form.companyName} onChange={handleChange} />
             <Select value={form.industry} onValueChange={(val) => setForm({ ...form, industry: val })}>
               <SelectTrigger className="w-full"><SelectValue placeholder="Select Industry" /></SelectTrigger>
               <SelectContent>
