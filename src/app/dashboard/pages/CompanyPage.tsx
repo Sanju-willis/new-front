@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, Input, Texta
 import { Loader2 } from 'lucide-react';
 import { apiPage } from '@/helpers/apiPages'; // at the top
 
-
 export default function CompanyPage() {
   const { data, isLoading, error, refetch, isFetching } = useCompanyData();
   const [status, setStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');

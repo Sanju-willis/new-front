@@ -7,10 +7,7 @@ import DashboardLayout from '@/components/layouts/DashLayout';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useAssistantStore } from '@/stores/useAssistantStore';
 
-import CampaignPage from './pages/CampaignPage'; // ← Add this
-import HomePage from './pages/HomePage';
-import CompanyPage from './pages/CompanyPage';
-import ProductsPage from './pages/ProductsPage';
+import { CampaignPage, CompanyPage, HomePage, ProductsPage } from '@/app/dashboard/pages';
 
 export default function DashboardHome() {
   const { user, progress } = useAuthStore();
