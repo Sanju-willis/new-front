@@ -1,17 +1,8 @@
 // src\stores\useAssistantStore.tsx
 import { create } from 'zustand';
 import { api } from '@/helpers/apiStores';
+import { AssistantState } from '@/types/storesTypes';
 
-interface AssistantMessagePayload {
-  input?: string;
-  stage?: string;
-  step?: string;
-}
-
-interface AssistantState {
-  messages: string[];
-  sendMessage: (payload: AssistantMessagePayload) => void;
-}
 
 export const useAssistantStore = create<AssistantState>((set) => ({
   messages: [],

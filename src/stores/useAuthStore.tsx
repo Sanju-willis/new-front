@@ -1,28 +1,8 @@
 // src\stores\useAuthStore.tsx
 import { create } from 'zustand';
 import { api } from '@/helpers/apiStores'
+import { AuthState } from '@/types/storesTypes';
 
-type Progress = {
-  company: string;
-  stage: 'company_created' | 'items_added';
-}
-type Company = {
-  _id: string;
-  name: string;
-}
-interface User {
-  name: string;
-  email: string;
-  photo: string;
-}
-
-interface AuthState {
-  user: User | null;
-  company: Company | null;
-  progress: Progress | null;
-  loading: boolean;
-  fetchUser: () => void;
-}
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
@@ -32,7 +12,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   fetchUser: async () => {
     try {
-      const data = await api.fetchUser(); // ✅ call centralized helper
+      const data = await api.fetchUser(); 
 
       set({
         user: data.user,
