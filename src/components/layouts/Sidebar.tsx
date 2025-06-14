@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Home, Building2, Boxes, Layers3, Settings, ChevronLeft, ChevronRight,Target } from 'lucide-react';
+import { Home, Building2, Boxes, Layers3, Settings, ChevronLeft, ChevronRight,Target, Plug } from 'lucide-react';
 
 interface SidebarProps {
   currentPage: string;
@@ -13,10 +13,11 @@ const navItems = [
   { id: 'home', label: 'Home', icon: Home },
   { id: 'company', label: 'Company', icon: Building2 },
   { id: 'products', label: 'Products', icon: Boxes },
-    { id: 'campaigns', label: 'Campaigns', icon: Target }, // ← Add this
-
+  { id: 'campaigns', label: 'Campaigns', icon: Target },
+  { id: 'integrations', label: 'Integrations', icon: Plug }, // ✅ New
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
+
 
 export default function Sidebar({ currentPage, onChange }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);

@@ -7,7 +7,7 @@ import DashboardLayout from '@/components/layouts/DashLayout';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useAssistantStore } from '@/stores/useAssistantStore';
 
-import { CampaignPage, CompanyPage, HomePage, ProductsPage } from '@/app/dashboard/pages';
+import { CampaignPage, CompanyPage, HomePage, ProductsPage, Integrations } from '@/app/dashboard/pages';
 
 export default function DashboardHome() {
   const { user, progress } = useAuthStore();
@@ -33,6 +33,7 @@ export default function DashboardHome() {
       case 'company': return <CompanyPage />;
       case 'products': return <ProductsPage />;
       case 'campaigns': return <CampaignPage />; // ← Add this line
+       case 'integrations': return <Integrations />;
       default: return <HomePage />;
     }
   };
