@@ -5,15 +5,10 @@
 import { useState } from 'react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useAssistantStore } from '@/stores/useAssistantStore';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem} from '@/components/ui/select';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Input, Button, Textarea , Select, SelectTrigger, SelectValue, SelectContent, SelectItem, ScrollArea} from '@/components/ui';
 import { cn } from '@/lib/utils';
 import { CompanyFormType } from '@/types/companyFormTypes';
 import { apiForm } from '@/helpers/apiForm';
-
 
 
 const industries = ['SaaS', 'E-commerce', 'Healthcare', 'Fintech'];
