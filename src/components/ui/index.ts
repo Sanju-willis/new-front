@@ -1,32 +1,11 @@
 // src\components\ui\index.ts
-export { Button } from './button';
-export { Input } from './input';
-export { Textarea } from './textarea';
-export { ScrollArea } from './scroll-area';
-
-export {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from './select';
-
-export {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from './card';
-
-export { Badge } from './badge';
-
-export {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from './tabs';
-
-export { BarChart } from './BarChart';
+export * from './button';
+export * from './input';
+export * from './textarea';
+export * from './scroll-area';
+export * from './select';
+export * from './card';
+export * from './badge';
+export * from './tabs';
+export * from './table';         // Ensure this exists
+export * from './BarChart';     // Ensure this exists

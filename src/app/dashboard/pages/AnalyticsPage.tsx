@@ -1,13 +1,9 @@
+// src\app\dashboard\pages\AnalyticsPage.tsx
 'use client';
 
 import React, { useState } from 'react';
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
-import {
+  ResponsiveContainer,
   LineChart,
   BarChart,
   Line,
@@ -15,25 +11,18 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer,
+  Legend,
+  CartesianGrid,
 } from 'recharts';
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card';
-import {
-  Table,
-  TableHead,
-  TableRow,
-  TableBody,
-  TableCell,
-  TableHeader,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+  Button, Input, Textarea, ScrollArea,
+  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
+  Card, CardContent, CardHeader, CardTitle, CardDescription,
+  Badge,
+  Tabs, TabsList, TabsTrigger, TabsContent,
+  Table, TableHeader, TableHead, TableBody, TableRow, TableCell,
+  
+} from '@/components/ui';
 
 type ChartPoint = { name: string; value: number } | null;
 
