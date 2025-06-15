@@ -1,18 +1,24 @@
-// src\app\dashboard\pages\IntegrationsPage.tsx
+// src/app/dashboard/pages/IntegrationsPage.tsx
 'use client';
+
 import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 export default function IntegrationsPage() {
   const router = useRouter();
+  const { platforms } = useAuthStore();
 
-  const platforms = [
+  const platformsList = [
     { name: 'Facebook', id: 'facebook' },
     { name: 'Instagram', id: 'instagram' },
     { name: 'YouTube', id: 'youtube' },
     { name: 'TikTok', id: 'tiktok' },
     { name: 'LinkedIn', id: 'linkedin' },
-    { name: 'Google Analytics', id: 'google_analytics' },
+    { name: 'Google Analytics', id: 'google' },
   ];
+
+  const isConnected = (platformId: string) =>
+    platforms?.some((p) => p.platform === platformId);
 
   const handleConnect = (id: string) => {
     window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/connect/${id}`;
@@ -26,20 +32,30 @@ export default function IntegrationsPage() {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {platforms.map(({ name, id }) => (
-          <div
-            key={id}
-            className="border rounded-lg p-4 flex items-center justify-between shadow-sm hover:shadow-md transition"
-          >
-            <span className="font-medium text-gray-800">{name}</span>
-            <button
-              className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded transition"
-              onClick={() => handleConnect(id)}
+        {platformsList.map(({ name, id }) => {
+          const connected = isConnected(id);
+
+          return (
+            <div
+              key={id}
+              className="border rounded-lg p-4 flex items-center justify-between shadow-sm hover:shadow-md transition"
             >
-              Connect
-            </button>
-          </div>
-        ))}
+              <div>
+                <span className="font-medium text-gray-800">{name}</span>
+                {connected && (
+                  <span className="ml-2 text-green-600 text-sm">Connected</span>
+                )}
+              </div>
+              <button
+                className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded transition disabled:bg-gray-400"
+                onClick={() => handleConnect(id)}
+                disabled={connected}
+              >
+                {connected ? 'Connected' : 'Connect'}
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

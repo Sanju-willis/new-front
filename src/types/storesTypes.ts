@@ -14,11 +14,20 @@ export interface User {
   email: string;
   photo: string;
 }
-
+export type PlatformType = 'facebook' | 'instagram' | 'google' | 'linkedin' | 'tiktok' | 'youtube';
+export interface Platform {
+ _id: string;
+  companyId: string;
+  platform: PlatformType;
+  connectedBy: string;
+  connectedAt: string;
+}
 export interface AuthState {
   user: User | null;
   company: Company | null;
   progress: Progress | null;
+    platforms: Platform[] | null;
+
   loading: boolean;
   fetchUser: () => void;
 }

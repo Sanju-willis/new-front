@@ -8,6 +8,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   company: null,
   progress: null,
+    platforms: null,
   loading: true,
 
   fetchUser: async () => {
@@ -18,6 +19,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         user: data.user,
         company: data.company || null,
         progress: data.progress || null,
+        platforms: data.platforms || null,
         loading: false,
       });
 
