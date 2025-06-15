@@ -3,7 +3,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export const api = {
   fetchUser: async () => {
-    const res = await fetch(`${BASE_URL}/auth/login`, {
+    const res = await fetch(`${BASE_URL}/login/facebook`, {
       credentials: 'include',
     });
     if (!res.ok) throw new Error('❌ Failed to fetch user');

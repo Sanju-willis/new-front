@@ -14,13 +14,9 @@ export default function IntegrationsPage() {
     { name: 'Google Analytics', id: 'google_analytics' },
   ];
 
- const handleConnect = (id: string) => {
-  if (id === 'facebook' || id === 'instagram') {
-    window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/facebook`;
-  } else {
-    alert(`TODO: Connect ${id}`);
-  }
-};
+  const handleConnect = (id: string) => {
+    window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/connect/${id}`;
+  };
 
   return (
     <div className="p-6">
@@ -33,9 +29,9 @@ export default function IntegrationsPage() {
         {platforms.map(({ name, id }) => (
           <div
             key={id}
-            className="border rounded-lg p-4 flex items-center justify-between"
+            className="border rounded-lg p-4 flex items-center justify-between shadow-sm hover:shadow-md transition"
           >
-            <span className="font-medium">{name}</span>
+            <span className="font-medium text-gray-800">{name}</span>
             <button
               className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded transition"
               onClick={() => handleConnect(id)}
