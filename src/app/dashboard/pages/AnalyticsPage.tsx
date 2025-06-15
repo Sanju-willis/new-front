@@ -1,3 +1,4 @@
+// src\app\dashboard\pages\AnalyticsPage.tsx
 'use client';
 
 import React, { useState } from 'react';
