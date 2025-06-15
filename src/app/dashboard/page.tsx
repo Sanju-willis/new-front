@@ -33,9 +33,8 @@ export default function DashboardHome() {
       case 'company': return <CompanyPage />;
       case 'products': return <ProductsPage />;
       case 'campaigns': return <CampaignPage />; // ← Add this line
-       case 'integrations': return <Integrations />;
-              case 'analytics': return <AnalyticsPage />;
-
+      case 'analytics': return <AnalyticsPage />;
+      case 'integrations': return <Integrations />;
       default: return <HomePage />;
     }
   };

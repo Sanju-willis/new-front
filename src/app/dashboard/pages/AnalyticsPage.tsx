@@ -1,4 +1,3 @@
-// src\app\dashboard\pages\AnalyticsPage.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -33,16 +32,15 @@ import {
   TableCell,
   TableHeader,
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+// Types
 
 type ChartPoint = { name: string; value: number } | null;
+type ChartType = 'line' | 'bar';
+type MetricKey = 'value';
+
+// Dummy Data
 
 const dummyData = [
   { name: 'Mon', value: 400 },
@@ -56,14 +54,34 @@ const dummyTableRows = [
   { metric: 'Impressions', organic: 1200, paid: 3500 },
   { metric: 'Clicks', organic: 150, paid: 700 },
   { metric: 'Conversions', organic: 8, paid: 42 },
+  { metric: 'CTR (%)', organic: 12.5, paid: 20 },
+  { metric: 'Conversion Rate (%)', organic: 5.3, paid: 6 },
+  { metric: 'Cost per Click ($)', organic: 0, paid: 1.25 },
+  { metric: 'CPM ($)', organic: 0, paid: 5.5 },
+];
+
+const audienceInsights = [
+  { label: 'Top Location', value: 'New York, USA' },
+  { label: 'Age Range', value: '25-34' },
+  { label: 'Gender Split', value: '60% Male / 40% Female' },
+  { label: 'Device Type', value: '70% Mobile / 30% Desktop' },
+  { label: 'Top Interests', value: 'Marketing, Tech, SaaS' },
+];
+
+const funnelSummary = [
+  { label: 'Sessions', value: 8000 },
+  { label: 'Leads', value: 500 },
+  { label: 'MQLs', value: 120 },
+  { label: 'SQLs', value: 45 },
+  { label: 'Deals', value: 20 },
+  { label: 'Revenue ($)', value: 8500 },
 ];
 
 const platforms = ['overview', 'facebook', 'instagram', 'tiktok', 'youtube', 'linkedin'] as const;
 const chartTypes = ['line', 'bar'] as const;
 const metrics = ['value'] as const;
 
-type ChartType = typeof chartTypes[number];
-type MetricKey = typeof metrics[number];
+// Component
 
 const AnalyticsPage = () => {
   const [hoveredPoint, setHoveredPoint] = useState<ChartPoint>(null);
@@ -75,7 +93,7 @@ const AnalyticsPage = () => {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Analytics Dashboard</h1>
         <div className="flex gap-3">
-          <Select onValueChange={(val) => setChartType(val as ChartType)} defaultValue={chartType}>
+          <Select onValueChange={(v) => setChartType(v as ChartType)} defaultValue={chartType}>
             <SelectTrigger className="w-[120px]">
               <SelectValue placeholder="Chart" />
             </SelectTrigger>
@@ -86,14 +104,12 @@ const AnalyticsPage = () => {
             </SelectContent>
           </Select>
 
-          <Select onValueChange={(val) => setMetric(val as MetricKey)} defaultValue={metric}>
+          <Select onValueChange={(v) => setMetric(v as MetricKey)} defaultValue={metric}>
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="Metric" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="value">Default</SelectItem>
-              <SelectItem value="organic">Organic</SelectItem>
-              <SelectItem value="paid">Paid</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -144,17 +160,30 @@ const AnalyticsPage = () => {
               </CardContent>
             </Card>
 
+            {hoveredPoint && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Hovered Insights</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground text-sm">
+                    You hovered on <b>{hoveredPoint.name}</b> with value: <b>{hoveredPoint[metric]}</b>
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
             <Card>
               <CardHeader>
-                <CardTitle>Metrics Table</CardTitle>
+                <CardTitle>Performance Metrics</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableCell>Metric</TableCell>
-                      <TableCell>Organic</TableCell>
-                      <TableCell>Paid</TableCell>
+                      <TableHead>Metric</TableHead>
+                      <TableHead>Organic</TableHead>
+                      <TableHead>Paid</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -170,18 +199,33 @@ const AnalyticsPage = () => {
               </CardContent>
             </Card>
 
-            {hoveredPoint && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Hovered Insights</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground text-sm">
-                    You hovered on <b>{hoveredPoint.name}</b> with value: <b>{hoveredPoint[metric as keyof typeof hoveredPoint]}</b>
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+            <Card>
+              <CardHeader>
+                <CardTitle>Audience Insights</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-2 gap-4">
+                {audienceInsights.map((item, idx) => (
+                  <div key={idx} className="text-sm">
+                    <p className="text-muted-foreground">{item.label}</p>
+                    <p className="font-medium">{item.value}</p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Funnel Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {funnelSummary.map((item, idx) => (
+                  <div key={idx} className="bg-muted p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground">{item.label}</p>
+                    <p className="text-lg font-semibold">{item.value}</p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
           </TabsContent>
         ))}
       </Tabs>

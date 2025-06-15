@@ -14,9 +14,8 @@ const navItems = [
   { id: 'company', label: 'Company', icon: Building2 },
   { id: 'products', label: 'Products', icon: Boxes },
   { id: 'campaigns', label: 'Campaigns', icon: Target },
+  { id: 'analytics', label: 'Analytics', icon: Layers3 }, // ✅ Added
   { id: 'integrations', label: 'Integrations', icon: Plug }, // ✅ New
-    { id: 'analytics', label: 'Analytics', icon: Layers3 }, // ✅ Added
-
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
