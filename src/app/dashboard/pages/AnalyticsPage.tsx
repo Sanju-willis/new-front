@@ -32,15 +32,10 @@ import {
   TableCell,
   TableHeader,
 } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-// Types
-
 type ChartPoint = { name: string; value: number } | null;
-type ChartType = 'line' | 'bar';
-type MetricKey = 'value';
-
-// Dummy Data
 
 const dummyData = [
   { name: 'Mon', value: 400 },
@@ -68,20 +63,28 @@ const audienceInsights = [
   { label: 'Top Interests', value: 'Marketing, Tech, SaaS' },
 ];
 
-const funnelSummary = [
-  { label: 'Sessions', value: 8000 },
-  { label: 'Leads', value: 500 },
-  { label: 'MQLs', value: 120 },
-  { label: 'SQLs', value: 45 },
-  { label: 'Deals', value: 20 },
-  { label: 'Revenue ($)', value: 8500 },
+const bestTimes = [
+  { label: 'Most Active Time', value: '8 PM - 10 PM' },
+  { label: 'Best Day for Reach', value: 'Wednesday' },
+  { label: 'Best Day for Conversions', value: 'Thursday' },
+];
+
+const topPosts = [
+  { title: 'AI Landing Page Tips', reach: 4500, engagement: 600, conversions: 35 },
+  { title: 'Boost Your Meta Ads', reach: 3900, engagement: 540, conversions: 29 },
+];
+
+const topCampaigns = [
+  { name: 'Launch Campaign A', platform: 'Facebook', spend: '$500', conversions: 40, cpa: '$12.5' },
+  { name: 'Retargeting Spring', platform: 'Instagram', spend: '$300', conversions: 25, cpa: '$12.0' },
 ];
 
 const platforms = ['overview', 'facebook', 'instagram', 'tiktok', 'youtube', 'linkedin'] as const;
 const chartTypes = ['line', 'bar'] as const;
 const metrics = ['value'] as const;
 
-// Component
+type ChartType = typeof chartTypes[number];
+type MetricKey = typeof metrics[number];
 
 const AnalyticsPage = () => {
   const [hoveredPoint, setHoveredPoint] = useState<ChartPoint>(null);
@@ -160,22 +163,9 @@ const AnalyticsPage = () => {
               </CardContent>
             </Card>
 
-            {hoveredPoint && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Hovered Insights</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground text-sm">
-                    You hovered on <b>{hoveredPoint.name}</b> with value: <b>{hoveredPoint[metric]}</b>
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-
             <Card>
               <CardHeader>
-                <CardTitle>Performance Metrics</CardTitle>
+                <CardTitle>Metrics Table</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -199,6 +189,19 @@ const AnalyticsPage = () => {
               </CardContent>
             </Card>
 
+            {hoveredPoint && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Hovered Insights</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground text-sm">
+                    You hovered on <b>{hoveredPoint.name}</b> with value: <b>{hoveredPoint[metric]}</b>
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
             <Card>
               <CardHeader>
                 <CardTitle>Audience Insights</CardTitle>
@@ -215,17 +218,76 @@ const AnalyticsPage = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Funnel Summary</CardTitle>
+                <CardTitle>Best Times to Engage</CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {funnelSummary.map((item, idx) => (
-                  <div key={idx} className="bg-muted p-4 rounded-lg">
-                    <p className="text-sm text-muted-foreground">{item.label}</p>
-                    <p className="text-lg font-semibold">{item.value}</p>
+              <CardContent className="grid grid-cols-2 gap-4">
+                {bestTimes.map((item, idx) => (
+                  <div key={idx} className="text-sm">
+                    <p className="text-muted-foreground">{item.label}</p>
+                    <p className="font-medium">{item.value}</p>
                   </div>
                 ))}
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Top Performing Posts</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Reach</TableHead>
+                      <TableHead>Engagement</TableHead>
+                      <TableHead>Conversions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {topPosts.map((post, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell>{post.title}</TableCell>
+                        <TableCell>{post.reach}</TableCell>
+                        <TableCell>{post.engagement}</TableCell>
+                        <TableCell>{post.conversions}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Top Campaigns</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Campaign</TableHead>
+                      <TableHead>Platform</TableHead>
+                      <TableHead>Spend</TableHead>
+                      <TableHead>Conversions</TableHead>
+                      <TableHead>CPA</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {topCampaigns.map((c, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell>{c.name}</TableCell>
+                        <TableCell>{c.platform}</TableCell>
+                        <TableCell>{c.spend}</TableCell>
+                        <TableCell>{c.conversions}</TableCell>
+                        <TableCell>{c.cpa}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+
           </TabsContent>
         ))}
       </Tabs>
