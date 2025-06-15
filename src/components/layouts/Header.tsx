@@ -45,9 +45,9 @@ export default function Header() {
           <DropdownMenuTrigger asChild>
             <Avatar className="cursor-pointer hover:ring-2 hover:ring-blue-500 transition">
               <AvatarImage
-                src={user.photo || '/avatar.png'}
-                alt={user.name}
-              />
+  src={user.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`}
+  alt={user.name}
+/>
               <AvatarFallback>
                 <User size={16} />
               </AvatarFallback>
